@@ -1,6 +1,7 @@
 # Empowering Masked Diffusion Models to Self-Correct with Leave-One-Out Transformers
 
 **Sofian Zalouk, Vincent Counathe, Paul Jünger, Daniel Cao, Daniel Zlotnick, Kilian Q. Weinberger, Christopher De Sa**
+
 Department of Computer Science, Cornell University
 
 **Accepted at NeurIPS 2026.**
