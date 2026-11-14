@@ -40,7 +40,7 @@ LOOT keeps three streams of hidden states: a left-to-right stream, a right-to-le
 
 ### Training objective
 
-Because the prediction at position *i* does not depend on whether *x<sub>i</sub>* is masked, the per-position masking probability can be marginalized analytically inside the masked-diffusion ELBO. The resulting objective supervises every token with the bounded weight *&alpha;'<sub>t</sub>*, equals the MDLM NELBO in expectation, and has strictly lower variance than both the MDLM objective and the two-term objectives used to train hollow transformers previously.
+Because the prediction at position *i* does not depend on whether *x<sub>i</sub>* is masked, the per-position masking probability can be marginalized analytically inside the masked-diffusion NELBO. The resulting objective supervises every token with the bounded weight *&alpha;'<sub>t</sub>* and equals the MDLM NELBO in expectation. It is a lower-variance estimator than the MDLM objective, and it removes the inverse-probability weights that diverge at the ends of the noise schedule in both the MDLM objective and the half-and-half objectives used to train hollow transformers previously.
 
 ### Self-correction
 
@@ -60,20 +60,20 @@ Parameter-matched comparison; LM1B at sequence length 128 for 1M steps, OpenWebT
 |---|---|---|
 | MDLM | 31.80 &plusmn; 0.08 | **25.20 &plusmn; 0.02** |
 | PGM | 31.04 &plusmn; 0.09 | 26.57 &plusmn; 0.02 |
-| **LOOT** | **31.02 &plusmn; 0.04** | 26.83 &plusmn; 0.01 |
+| **LOOT** | 31.02 &plusmn; 0.04 | 26.83 &plusmn; 0.01 |
 
 On LM1B, LOOT matches PGM and improves over MDLM. At sequence length 1024 a gap to MDLM remains: the cost of the leave-one-out constraint grows with length while the benefit of dense supervision stays roughly constant.
 
 ### Self-correction on OpenWebText
 
-Self-correction is where the architecture pays off. On unconditional generation at length 1024, LOOT with self-correction at **256 NFE** matches or exceeds ReMDM at **2048 NFE** across the full quality-diversity frontier, using **8x fewer forward evaluations** and, after accounting for the 2.2x cost of a LOOT forward pass, **3.5x fewer inference FLOPs** and about **8x less wall-clock time per sample**.
+Self-correction is where the architecture pays off. On unconditional generation at length 1024, LOOT with self-correction at **256 NFE** matches or exceeds ReMDM at **2048 NFE** across the full quality-diversity frontier, using **8× fewer forward evaluations** and, after accounting for the 2.2× cost of a LOOT forward pass, **3.5× fewer inference FLOPs** and, in our measurements, about **8× less wall-clock time per sample**.
 
 <p align="center">
   <img src="assets/frontier_loot_vs_remdm.png" width="62%" alt="LOOT at 256 and 512 NFE versus ReMDM at 2048 NFE">
   <img src="assets/mauve_vs_nfe.png" width="34%" alt="MAUVE across NFE budgets">
 </p>
 
-Left: generative perplexity against sample entropy over a temperature sweep. Right: MAUVE on 5000 samples per point, under the evaluation protocol of ReMDM. At the entropy of natural text, blocked Gibbs at 256 NFE reaches a generative perplexity of 23.7 against 41.3 for ReMDM at 2048 NFE, and a MAUVE of 0.41 against 0.35.
+Left: generative perplexity against sample entropy over a temperature sweep. Right: MAUVE on 5000 samples per point, under the evaluation protocol of ReMDM. At matched sample entropy, blocked Gibbs at 256 NFE reaches a generative perplexity of 20.1 against 31.2 for ReMDM at 2048 NFE, and a MAUVE of 0.41 against 0.35.
 
 <p align="center">
   <img src="assets/frontiers_all_nfe.png" width="95%" alt="Quality-diversity frontiers at every NFE budget">
